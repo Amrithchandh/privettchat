@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
@@ -25,22 +25,23 @@ class ChatService {
     required String senderId,
     required String text,
     MessageType type = MessageType.text,
-    File? file,
+    Uint8List? fileBytes,
+    String? fileName,
     String? replyToId,
   }) async {
     String? mediaUrl;
 
-    if (file != null) {
+    if (fileBytes != null && fileName != null) {
       String folder = 'documents';
       if (type == MessageType.image) folder = 'images';
       if (type == MessageType.video) folder = 'videos';
       if (type == MessageType.audio) folder = 'audios';
 
-      final String extension = file.path.split('.').last;
+      final String extension = fileName.split('.').last;
       final String fileName = "${const Uuid().v4()}.$extension";
       final ref = _storage.ref().child('chats/$_chatRoomId/$folder/$fileName');
       
-      await ref.putFile(file);
+      await ref.putData(fileBytes);
       mediaUrl = await ref.getDownloadURL();
     }
 

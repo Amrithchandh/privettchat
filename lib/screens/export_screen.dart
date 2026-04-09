@@ -1,7 +1,6 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -52,13 +51,9 @@ class _ExportScreenState extends State<ExportScreen> {
         )
       );
 
-      final output = await getTemporaryDirectory();
-      final file = File("${output.path}/chat_export_${DateTime.now().millisecondsSinceEpoch}.pdf");
-      await file.writeAsBytes(await pdf.save());
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Exported successfully to: ${file.path}'))
+          const SnackBar(content: Text('Exported successfully!'))
         );
         // You can use the 'printing' package to share/print it directly
         await Printing.sharePdf(bytes: await pdf.save(), filename: 'chat_export.pdf');
